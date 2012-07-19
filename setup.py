@@ -14,11 +14,13 @@ setup(name='componentae',
       author_email='kagesenshi.87@gmail.com',
       url='',
       license='MIT',
-      packages='componentae',
+      packages=['componentae'],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
-          # -*- Extra requirements: -*-
+        'grokcore.component',
+        'chameleon',
+        'traject'
       ],
       entry_points="""
       # -*- Entry points: -*-

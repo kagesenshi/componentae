@@ -1,5 +1,11 @@
 from StringIO import StringIO
 from zope.configuration.xmlconfig import xmlconfig
+from zope.component import getUtility, getGlobalSiteManager
+from zope.interface import directlyProvides
+from componentae.interfaces import IConfig
+from componentae.interfaces import ITemplateLoader
+from chameleon.zpt import loader
+import os
 
 def load_components(packages):
 
@@ -13,3 +19,22 @@ def load_components(packages):
         %s
         </configure>''' % snippet
     ))
+
+def set_config(key, value):
+    config = getUtility(IConfig)
+    config[key] = value
+
+def get_config(key):
+    config = getUtility(IConfig)
+    return config[key]
+
+
+def register_templatedir(template_path):
+    template_loader = loader.TemplateLoader(
+        template_path,
+        auto_reload=os.environ['SERVER_SOFTWARE'].startswith('Dev') 
+    )
+
+    gsm = getGlobalSiteManager()
+    directlyProvides(template_loader, ITemplateLoader)
+    gsm.registerUtility(template_loader)

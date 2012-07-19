@@ -25,3 +25,6 @@ class ITraverser(Interface):
 
 class ITemplateLoader(Interface):
     pass
+
+class IConfig(Interface):
+    pass

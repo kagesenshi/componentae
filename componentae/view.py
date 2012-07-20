@@ -3,20 +3,18 @@ from componentae.interfaces import IContext, ITemplateLoader, IView
 from webapp2 import Request, Response
 from zope.component import getUtility
 
-class View(grok.MultiAdapter):
+class View(grok.Adapter):
     grok.implements(IView)
     grok.baseclass()
-    grok.adapts(IContext, Request, Response)
 
-    def __init__(self, context, request, response):
+    def __init__(self, context):
         self.context = context
-        self.request = request
-        self.response = response
 
     def render(self):
         if getattr(self, 'template', None):
             templateloader = getUtility(ITemplateLoader)
             template = templateloader.load(self.template)
-            return template(context=self.context, request=self.request)
+            return template(context=self.context, request=self.request,
+                    response=self.response)
         self.response.headers['Content-Type'] = 'text/plain'
         return repr(self)

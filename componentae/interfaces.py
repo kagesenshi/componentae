@@ -1,6 +1,7 @@
 from zope.interface import Interface
+import grokcore.component.interfaces as grokiface
 
-class IContext(Interface):
+class IContext(grokiface.IContext):
     pass
 
 class IApplication(IContext):

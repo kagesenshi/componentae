@@ -1,7 +1,7 @@
 from componentae.interfaces import ITraverser, IView, IContext
 from webob.exc import HTTPNotFound
 import grokcore.component as grok
-from zope.component import ComponentLookupError, getMultiAdapter
+from zope.component import ComponentLookupError, getMultiAdapter, getAdapter
 import traject
 
 class Traverser(grok.Adapter):
@@ -23,10 +23,9 @@ class Traverser(grok.Adapter):
             name = '/'.join(stack) if stack else 'index'
             if name == '/':
                 name = 'index'
-            return getMultiAdapter(
-                (self.context, request, response),
-                IView, 
-                name=name
-            )
+            view = getAdapter(self.context, IView, name=name)
+            view.request = request
+            view.response = response
+            return view
         except ComponentLookupError:
             raise HTTPNotFound

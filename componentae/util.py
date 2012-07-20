@@ -27,14 +27,3 @@ def set_config(key, value):
 def get_config(key):
     config = getUtility(IConfig)
     return config[key]
-
-
-def register_templatedir(template_path):
-    template_loader = loader.TemplateLoader(
-        template_path,
-        auto_reload=os.environ['SERVER_SOFTWARE'].startswith('Dev') 
-    )
-
-    gsm = getGlobalSiteManager()
-    directlyProvides(template_loader, ITemplateLoader)
-    gsm.registerUtility(template_loader)

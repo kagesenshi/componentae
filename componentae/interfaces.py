@@ -29,3 +29,6 @@ class ITemplateLoader(Interface):
 
 class IConfig(Interface):
     pass
+
+class IViewLookup(Interface):
+    pass

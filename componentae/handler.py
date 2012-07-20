@@ -1,5 +1,5 @@
 from componentae.interfaces import ITraverser, ITemplateLoader
-from componentae.app import Application
+from componentae.model import Application
 from zope.component import getUtility
 import grokcore.component as grok
 import webapp2

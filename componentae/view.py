@@ -1,7 +1,7 @@
 import grokcore.component as grok
 from componentae.interfaces import (IContext, 
                                     ITemplateLoader, 
-                                    IView,
+                                    IView, ISession,
                                     IViewLookup)
 from webapp2 import Request, Response
 from zope.component import getUtility, getAdapter, ComponentLookupError
@@ -26,11 +26,16 @@ class View(grok.Adapter):
     def __init__(self, context):
         self.context = context
 
+    def update(self):
+        pass
+
     def render(self):
+        self.update()
+        getUtility(ISession).commit()
         if getattr(self, 'template', None):
             views = IViewLookup(self.context)
             return self.template(
                     context=self.context, request=self.request,
-                    response=self.response, views=views)
+                    response=self.response, views=views, view=self)
         self.response.headers['Content-Type'] = 'text/plain'
         return repr(self)

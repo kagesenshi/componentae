@@ -32,3 +32,14 @@ class IConfig(Interface):
 
 class IViewLookup(Interface):
     pass
+
+class IAnnotation(Interface):
+    pass
+
+
+class ICommitable(Interface):
+    pass
+
+class ISession(Interface):
+    pass
+

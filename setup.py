@@ -19,8 +19,8 @@ setup(name='componentae',
       zip_safe=False,
       install_requires=[
         'grokcore.component',
+        'zope.globalrequest',
         'chameleon',
-        'traject'
       ],
       entry_points="""
       # -*- Entry points: -*-

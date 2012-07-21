@@ -1,0 +1,2 @@
+class NameConflictError(Exception):
+    pass

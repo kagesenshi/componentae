@@ -3,11 +3,14 @@ from zope.component.interfaces import IFactory
 from componentae.interfaces import (
     IContext, IApplication, ICommitable, ISession
 )
-from zope.component import getUtility
+from componentae import exc
+from zope.component import getUtility, getGlobalSiteManager
 from google.appengine.ext import db
 from zope.interface import implementedBy
 from zope.globalrequest import getRequest
 from zope.interface.declarations import Implements
+
+_marker = []
 
 class Node(db.Model):
     name = db.StringProperty(required=True)
@@ -21,7 +24,21 @@ class Node(db.Model):
             return [(node.name, node) for node in nodes]
         return []
 
+    def values(self):
+        nodes = self.node_set
+        if nodes:
+            return [node for node in nodes]
+        return []
+
+    def keys(self):
+        nodes = self.node_set
+        if nodes:
+            return [node.name for node in nodes]
+        return []
+
     def __setitem__(self, key, value):
+        if self.get(key, None):
+            raise exc.NameConflictError()
         value.name = key
         value.container = self
 
@@ -30,6 +47,14 @@ class Node(db.Model):
             if k == key:
                 return v
         raise KeyError(key)
+
+    def get(self, key, default=_marker):
+        try:
+            return self[key]
+        except KeyError, e:
+            if default is not _marker:
+                return default
+            raise e
 
     def getPath(self):
         if getattr(self, '_path', None) is None:
@@ -53,7 +78,7 @@ class Committer(grok.Adapter):
     def put(self):
         self.context.put()
 
-_marker = []
+
 
 class Context(grok.Adapter):
     """
@@ -98,6 +123,12 @@ class Context(grok.Adapter):
             result.append((key, self[key]))
         return result
 
+    def values(self):
+        return [v for k, v in self.items()]
+
+    def keys(self):
+        return [k for k, v in self.items()]
+
     def __setattr__(self, key, value):
         if key in ['_node', '_path']:
             self.__dict__[key] = value
@@ -105,7 +136,7 @@ class Context(grok.Adapter):
 
         # set values on the annotation if the fields are from there
         if self.annotation_model and key in self.annotation_model.fields():
-            setattr(self, _annotation, key, value)
+            setattr(self._annotation, key, value)
 
         return setattr(self._node, key, value)
 
@@ -137,6 +168,10 @@ class Application(Context):
     grok.context(Node)
 
 
+    def getSiteManager(self):
+        return getGlobalSiteManager()
+
+
 class ApplicationFactory(grok.GlobalUtility):
     grok.implements(IFactory)
     grok.name('Application')
@@ -163,6 +198,7 @@ class Factory(grok.GlobalUtility):
         portal_type = getattr(self, 'grokcore.component.directive.name')
         node = Node(name=name, portal_type=portal_type)
         getUtility(ISession).add(node)
+        node.put()
         return self.iface(node)
 
     def getInterfaces(self):

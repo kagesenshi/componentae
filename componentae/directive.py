@@ -12,3 +12,8 @@ def template(name):
         auto_reload=os.environ['SERVER_SOFTWARE'].startswith('Dev')
     )
     frame.f_locals['template'] = template_loader.load(name)
+
+
+def require(name):
+    frame = sys._getframe(1)
+    frame.f_locals['permission_required'] = name

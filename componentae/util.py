@@ -2,7 +2,7 @@ from StringIO import StringIO
 from zope.configuration.xmlconfig import xmlconfig
 from zope.component import getUtility, getGlobalSiteManager
 from zope.interface import directlyProvides
-from componentae.interfaces import IConfig
+from componentae.interfaces import IConfig, ISession
 from componentae.interfaces import ITemplateLoader
 from chameleon.zpt import loader
 import os
@@ -27,3 +27,6 @@ def set_config(key, value):
 def get_config(key):
     config = getUtility(IConfig)
     return config[key]
+
+def session_add(obj):
+    getUtility(ISession).add(obj)

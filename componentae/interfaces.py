@@ -43,3 +43,8 @@ class ICommitable(Interface):
 class ISession(Interface):
     pass
 
+class IRoleManager(Interface):
+    pass
+
+class IRole(Interface):
+    pass
